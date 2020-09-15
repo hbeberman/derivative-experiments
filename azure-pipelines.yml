@@ -22,8 +22,21 @@ steps:
     # Fix go 1.13 link
     /usr/bin/go version || echo "Failed to find /usr/bin/go, attempting to symlink"
     sudo ln -vs /usr/lib/go-1.13/bin/go /usr/bin/go || echo "Failed to symlink go, continuing"
-  displayName: 'Install prereqs'
+  displayName: 'Install Prereqs'
 - script: |
     cd cbl-mariner/toolkit
     sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y PROJECT_ROOT=$(pwd)/../..
-  displayName: 'Build packages'
+  displayName: 'Build Packages'
+- script: |
+    cd cbl-mariner/toolkit
+    sudo make image CONFIG_FILE=../../imageconfigs/container.json REBUILD_TOOLS=y PROJECT_ROOT=$(pwd)/../.. 
+  displayName: 'Build Container'
+- script: |
+    cp -r out/RPMS $(Build.ArtifactStagingDirectory)
+    cp -r out/images $(Build.ArtifactStagingDirectory)
+  displayName: 'Stage Artifacts'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'Published'
+    publishLocation: 'Container'
