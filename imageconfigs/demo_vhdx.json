@@ -45,9 +45,9 @@
                 }
             ],
             "PackageLists": [
-                "demo_package_lists/core-packages.json",
-                "demo_package_lists/demo-packages.json",
-                "demo_package_lists/uefi-bootloader-packages.json"
+                "packagelists/core-packages.json",
+                "packagelists/demo-packages.json",
+                "packagelists/uefi-bootloader-packages.json"
             ],
             "KernelOptions": {
                 "default": "kernel-hyperv"

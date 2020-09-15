@@ -1,0 +1,26 @@
+{
+    "Disks": [
+        {
+            "Artifacts": [
+                {
+                    "Name": "core",
+                    "Compression": "tar.gz"
+                }
+            ]
+        }
+    ],
+    "SystemConfigs": [
+        {
+            "Name": "Standard",
+            "PackageLists": [
+                "packagelists/core-packages-container.json",
+                "packagelists/demo-packages.json"
+            ],
+            "PostInstallScripts": [
+                {
+                    "Path": "postinstallscripts/cleanup-and-set-term.sh"
+                }
+            ]
+        }
+    ]
+}
