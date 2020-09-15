@@ -1,0 +1,3 @@
+[submodule "cbl-mariner"]
+	path = cbl-mariner
+	url = https://github.com/microsoft/cbl-mariner
