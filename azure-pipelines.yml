@@ -10,10 +10,20 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
+- checkout: self
+  submodules: true
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    # Add a backports repo in order to install the latest version of Go.
+    sudo add-apt-repository ppa:longsleep/golang-backports
+    sudo apt-get update
+    # Install required dependencies.
+    sudo apt -y install make tar wget curl rpm qemu-utils golang-1.13-go genisoimage pigz
+
+    # Fix go 1.13 link
+    /usr/bin/go version || echo "Failed to find /usr/bin/go, attempting to symlink"
+    sudo ln -vs /usr/lib/go-1.13/bin/go /usr/bin/go || echo "Failed to symlink go, continuing"
+  displayName: 'Install prereqs'
+- script: |
+    cd cbl-mariner/toolkit
+    sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y PROJECT_ROOT=$(pwd)/../..
+  displayName: 'Build packages'
