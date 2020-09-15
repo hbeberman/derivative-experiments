@@ -1,0 +1,7 @@
+{
+    "packages": [
+        "hello",
+        "openssh-server",
+        "cifs-utils"
+    ]
+}
