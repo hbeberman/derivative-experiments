@@ -37,17 +37,17 @@ steps:
   displayName: 'Stage Artifacts'
 - script: |
     docker import out/images/container/*.tar.gz mariner:latest
+    docker tag mariner:latest mariner:$(Build.BuildId)
   displayName: 'Docker Import Image'
 - script: |
     cd cbl-mariner/toolkit
     sudo make clean -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y PROJECT_ROOT=$(pwd)/../..
   displayName: 'Clean'
-- task: PublishBuildArtifacts@1
+- task: Docker@2
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'Published'
-    publishLocation: 'Container'
-
+    containerRegistry: 'hebeberm_docker_registry'
+    command: 'login'
+    addPipelineData: false
 - task: Docker@2
   inputs:
     containerRegistry: 'hebeberm_docker_registry'
@@ -56,3 +56,14 @@ steps:
     tags: |
       $(Build.BuildId)
       latest
+- task: Docker@2
+  inputs:
+    containerRegistry: 'hebeberm_docker_registry'
+    command: 'logout'
+    addPipelineData: false
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'Published'
+    publishLocation: 'Container'
+
