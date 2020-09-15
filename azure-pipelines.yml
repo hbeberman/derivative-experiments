@@ -27,3 +27,11 @@ steps:
     cd cbl-mariner/toolkit
     sudo make build-packages -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y PROJECT_ROOT=$(pwd)/../..
   displayName: 'Build packages'
+- script: |
+    cp -r out/RPMS $(Build.ArtifactStagingDirectory)
+  displayName: 'Stage Artifacts'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'Published'
+    publishLocation: 'Container'
