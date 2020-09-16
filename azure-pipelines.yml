@@ -36,8 +36,8 @@ steps:
     cp -r out/images $(Build.ArtifactStagingDirectory)
   displayName: 'Stage Artifacts'
 - script: |
-    docker import out/images/container/*.tar.gz mariner:latest
-    docker tag mariner:latest mariner:$(Build.BuildId)
+    docker import out/images/container/*.tar.gz local/mariner:latest
+    docker tag local/mariner:latest local/mariner:$(Build.BuildId)
   displayName: 'Docker Import Image'
 - script: |
     cd cbl-mariner/toolkit
