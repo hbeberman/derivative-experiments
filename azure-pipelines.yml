@@ -39,15 +39,22 @@ steps:
     docker import out/images/container/*.tar.gz $(DOCKER_REGISTRY)/mariner:latest
     docker tag $(DOCKER_REGISTRY)/mariner:latest $(DOCKER_REGISTRY)/mariner:$(Build.BuildId)
   displayName: 'Docker Import Image'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'Published'
+    publishLocation: 'Container'
+  displayName: 'Publish Artifacts'
 - script: |
     cd cbl-mariner/toolkit
     sudo make clean -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y PROJECT_ROOT=$(pwd)/../..
-  displayName: 'Clean'
+  displayName: 'Clean the build'
 - task: Docker@2
   inputs:
     containerRegistry: 'hebeberm_docker_registry'
     command: 'login'
     addPipelineData: false
+  displayName: 'Docker Registry Login'
 - task: Docker@2
   inputs:
     containerRegistry: 'hebeberm_docker_registry'
@@ -56,14 +63,10 @@ steps:
     tags: |
       $(Build.BuildId)
       latest
+  displayName: 'Docker Push'
 - task: Docker@2
   inputs:
     containerRegistry: 'hebeberm_docker_registry'
     command: 'logout'
     addPipelineData: false
-- task: PublishBuildArtifacts@1
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'Published'
-    publishLocation: 'Container'
-
+  displayName: 'Docker Registry Logout'
