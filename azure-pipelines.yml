@@ -51,7 +51,7 @@ steps:
 - task: Docker@2
   inputs:
     containerRegistry: 'hebeberm_docker_registry'
-    repository: 'hebebermhostcr.azurecr.io/mariner'
+    repository: 'mariner'
     command: 'push'
     tags: |
       $(Build.BuildId)
