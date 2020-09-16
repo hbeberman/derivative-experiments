@@ -12,16 +12,12 @@ pool:
 steps:
 - checkout: self
   submodules: true
+- task: GoTool@0
+  inputs:
+    version: '1.13'
+  displayName: 'Install Go 1.13'
 - script: |
-    # Add a backports repo in order to install the latest version of Go.
-    sudo add-apt-repository ppa:longsleep/golang-backports
-    sudo apt-get update
-    # Install required dependencies.
-    sudo apt -y install make tar wget curl rpm qemu-utils golang-1.13-go genisoimage pigz
-
-    # Fix go 1.13 link
-    /usr/bin/go version || echo "Failed to find /usr/bin/go, attempting to symlink"
-    sudo ln -vs /usr/lib/go-1.13/bin/go /usr/bin/go || echo "Failed to symlink go, continuing"
+    sudo apt -y install make tar wget curl rpm qemu-utils genisoimage pigz
   displayName: 'Install Prereqs'
 - script: |
     cd cbl-mariner/toolkit
@@ -35,8 +31,38 @@ steps:
     cp -r out/RPMS $(Build.ArtifactStagingDirectory)
     cp -r out/images $(Build.ArtifactStagingDirectory)
   displayName: 'Stage Artifacts'
+- script: |
+    docker import out/images/container/*.tar.gz $(DOCKER_REGISTRY)/mariner:latest
+    docker tag $(DOCKER_REGISTRY)/mariner:latest $(DOCKER_REGISTRY)/mariner:$(Build.BuildId)
+  displayName: 'Docker Import Image'
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'Published'
     publishLocation: 'Container'
+  displayName: 'Publish Artifacts'
+- script: |
+    cd cbl-mariner/toolkit
+    sudo make clean -j$(nproc) CONFIG_FILE= REBUILD_TOOLS=y PROJECT_ROOT=$(pwd)/../..
+  displayName: 'Clean the build'
+- task: Docker@2
+  inputs:
+    containerRegistry: 'hebeberm_docker_registry'
+    command: 'login'
+    addPipelineData: false
+  displayName: 'Docker Registry Login'
+- task: Docker@2
+  inputs:
+    containerRegistry: 'hebeberm_docker_registry'
+    repository: 'mariner'
+    command: 'push'
+    tags: |
+      $(Build.BuildId)
+      latest
+  displayName: 'Docker Push'
+- task: Docker@2
+  inputs:
+    containerRegistry: 'hebeberm_docker_registry'
+    command: 'logout'
+    addPipelineData: false
+  displayName: 'Docker Registry Logout'
