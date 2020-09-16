@@ -36,8 +36,8 @@ steps:
     cp -r out/images $(Build.ArtifactStagingDirectory)
   displayName: 'Stage Artifacts'
 - script: |
-    docker import out/images/container/*.tar.gz hebebermhostcr.azurecr.io/mariner:latest
-    docker tag hebebermhostcr.azurecr.io/mariner:latest hebebermhostcr.azurecr.io/mariner:$(Build.BuildId)
+    docker import out/images/container/*.tar.gz $(DOCKER_REGISTRY)/mariner:latest
+    docker tag $(DOCKER_REGISTRY)/mariner:latest $(DOCKER_REGISTRY)/mariner:$(Build.BuildId)
   displayName: 'Docker Import Image'
 - script: |
     cd cbl-mariner/toolkit
